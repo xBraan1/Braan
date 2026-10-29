@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "predeploy": "npm run build",
+    "deploy": "wrangler deploy",
     "cf:dev": "wrangler dev",
     "cf:deploy": "npm run build && wrangler deploy"
   },
