@@ -4,7 +4,7 @@ Brian Kibet — AI Trainer & LLM Evaluation Specialist portfolio website.
 
 ## Overview
 
-A professional portfolio website showcasing AI evaluation expertise, including RLHF, SFT, prompt engineering, and model quality assessment. Built with React, TypeScript, Vite, and Tailwind CSS. Deployed on Cloudflare Workers using Static Assets.
+A professional portfolio website showcasing AI evaluation expertise, including RLHF, SFT, prompt engineering, and model quality assessment. Built with React, TypeScript, Vite, and Tailwind CSS. Deployed on **Cloudflare Workers** using Static Assets.
 
 ## Technology Stack
 
@@ -90,33 +90,42 @@ Output is in `dist/`.
 npm run preview
 ```
 
-## Deployment
+## Deployment to Cloudflare Workers
 
-### Cloudflare Workers
+This project deploys to **Cloudflare Workers** using Static Assets (NOT Cloudflare Pages).
 
-This project deploys to Cloudflare Workers using Static Assets.
-
-#### Prerequisites
+### Prerequisites
 
 1. A Cloudflare account
-2. Wrangler CLI installed (`npm install -g wrangler`)
+2. Wrangler CLI installed (`npm install -g wrangler` or use the project-local version)
 3. Authenticate: `wrangler login`
 
-#### Deploy
+### Deploy (One Command)
 
 ```bash
+npm run cf:deploy
+```
+
+This runs `npm run build` first, then `wrangler deploy`.
+
+### Deploy (Manual Steps)
+
+```bash
+# Step 1: Build the production assets
 npm run build
+
+# Step 2: Deploy to Cloudflare Workers
 npx wrangler deploy
 ```
 
-#### Local Preview with Wrangler
+### Local Preview with Wrangler
 
 ```bash
 npm run build
-npx wrangler dev
+npm run cf:dev
 ```
 
-### GitHub Actions
+### GitHub Actions (Automatic)
 
 The included workflow (`.github/workflows/deploy.yml`) automatically deploys on push to `main`.
 
@@ -130,8 +139,9 @@ Required repository secrets:
 
 ```jsonc
 {
+  "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "xbraan1-portfolio",
-  "compatibility_date": "2024-12-01",
+  "compatibility_date": "2026-10-29",
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
@@ -139,7 +149,9 @@ Required repository secrets:
 }
 ```
 
-The `single-page-application` setting ensures client-side routes are served by the SPA entry point.
+Key settings:
+- **`assets.directory`**: Points to the Vite build output (`./dist`)
+- **`assets.not_found_handling`**: Set to `single-page-application` so client-side routes (e.g., `/about`, `/services/llm-evaluation`) are served by the SPA entry point instead of returning 404
 
 ### Custom Domain
 
@@ -168,6 +180,29 @@ The site uses a pure black and white luxury aesthetic — the xBraan1 signature 
 - ARIA labels on interactive elements
 - Reduced motion support
 - Screen reader friendly navigation
+
+## Troubleshooting
+
+### "Could not detect a directory containing static files"
+
+This error occurs when `wrangler deploy` runs but the `dist/` directory doesn't exist. Fix:
+
+```bash
+# Always build before deploying
+npm run build
+npx wrangler deploy
+
+# Or use the combined command
+npm run cf:deploy
+```
+
+### Client-side routes return 404
+
+Ensure `wrangler.jsonc` has `"not_found_handling": "single-page-application"` in the `assets` section. This tells Workers to serve `index.html` for all unmatched routes, allowing React Router to handle client-side navigation.
+
+### Fonts not loading
+
+The site loads Inter and Alex Brush from Google Fonts. If fonts don't appear, check your network connection. The fonts are loaded via `<link>` tags in `index.html`.
 
 ## License
 
