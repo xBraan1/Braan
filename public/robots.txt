@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://xbraan1-portfolio.workers.dev/sitemap.xml
